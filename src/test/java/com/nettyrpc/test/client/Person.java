@@ -28,4 +28,21 @@ public class Person {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
+    @Override
+    public String toString(){
+        return firstName + " " + lastName;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.firstName.hashCode()^this.lastName.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Person) ) return false;
+        Person p = (Person)obj;
+        return this.firstName.equals(p.firstName) && this.lastName.equals(p.lastName);
+    }
 }

@@ -1,4 +1,4 @@
-package com.nettyrpc.common;
+package com.nettyrpc.protocol;
 
 /**
  * 封装 RPC 响应
@@ -9,7 +9,7 @@ package com.nettyrpc.common;
 public class RpcResponse {
 
     private String requestId;
-    private Throwable error;
+    private String error;
     private Object result;
 
     public boolean isError() {
@@ -24,11 +24,11 @@ public class RpcResponse {
         this.requestId = requestId;
     }
 
-    public Throwable getError() {
+    public String getError() {
         return error;
     }
 
-    public void setError(Throwable error) {
+    public void setError(String error) {
         this.error = error;
     }
 

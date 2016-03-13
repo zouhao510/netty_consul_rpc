@@ -1,9 +1,9 @@
 package com.nettyrpc.client;
 
-import com.nettyrpc.common.RpcDecoder;
-import com.nettyrpc.common.RpcEncoder;
-import com.nettyrpc.common.RpcRequest;
-import com.nettyrpc.common.RpcResponse;
+import com.nettyrpc.protocol.RpcDecoder;
+import com.nettyrpc.protocol.RpcEncoder;
+import com.nettyrpc.protocol.RpcRequest;
+import com.nettyrpc.protocol.RpcResponse;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,13 +14,16 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * RPC 客户端（用于发送 RPC 请求）
  *
- * @author huangyong
+ * @author huangyong,luxiaoxun
  * @since 1.0.0
  */
 public class RpcClient extends SimpleChannelInboundHandler<RpcResponse> {
@@ -31,8 +34,7 @@ public class RpcClient extends SimpleChannelInboundHandler<RpcResponse> {
     private int port;
 
     private RpcResponse response;
-
-    private final Object obj = new Object();
+    private CountDownLatch countWait = new CountDownLatch(1);
 
     public RpcClient(String host, int port) {
         this.host = host;
@@ -42,10 +44,7 @@ public class RpcClient extends SimpleChannelInboundHandler<RpcResponse> {
     @Override
     public void channelRead0(ChannelHandlerContext ctx, RpcResponse response) throws Exception {
         this.response = response;
-
-        synchronized (obj) {
-            obj.notifyAll();
-        }
+        countWait.countDown();
     }
 
     @Override
@@ -64,18 +63,20 @@ public class RpcClient extends SimpleChannelInboundHandler<RpcResponse> {
                         public void initChannel(SocketChannel channel) throws Exception {
                             channel.pipeline()
                                     .addLast(new RpcEncoder(RpcRequest.class))
+                                    .addLast(new LengthFieldBasedFrameDecoder(65536,0,4,0,0))
                                     .addLast(new RpcDecoder(RpcResponse.class))
                                     .addLast(RpcClient.this);
                         }
                     })
-                    .option(ChannelOption.SO_KEEPALIVE, true);
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .option(ChannelOption.SO_REUSEADDR,true);
 
             ChannelFuture future = bootstrap.connect(host, port).sync();
             future.channel().writeAndFlush(request).sync();
 
-            synchronized (obj) {
-                obj.wait();
-            }
+            LOGGER.debug("Waiting for response for request " + request.getRequestId());
+            countWait.await();
+            LOGGER.debug("Receive response for request "+request.getRequestId());
 
             if (response != null) {
                 future.channel().closeFuture().sync();

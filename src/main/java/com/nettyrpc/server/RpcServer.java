@@ -1,9 +1,9 @@
 package com.nettyrpc.server;
 
-import com.nettyrpc.common.RpcDecoder;
-import com.nettyrpc.common.RpcEncoder;
-import com.nettyrpc.common.RpcRequest;
-import com.nettyrpc.common.RpcResponse;
+import com.nettyrpc.protocol.RpcDecoder;
+import com.nettyrpc.protocol.RpcEncoder;
+import com.nettyrpc.protocol.RpcRequest;
+import com.nettyrpc.protocol.RpcResponse;
 import com.nettyrpc.registry.ServiceRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -15,6 +15,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.*;
+
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +29,7 @@ import org.springframework.context.ApplicationContextAware;
 /**
  * RPC 服务器（用于发布 RPC 服务）
  *
- * @author huangyong
+ * @author huangyong,luxiaoxun
  * @since 1.0.0
  */
 public class RpcServer implements ApplicationContextAware, InitializingBean {
@@ -37,6 +40,8 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
     private ServiceRegistry serviceRegistry;
 
     private Map<String, Object> handlerMap = new HashMap<>();
+
+    private static ThreadPoolExecutor threadPoolExecutor;
 
     public RpcServer(String serverAddress) {
         this.serverAddress = serverAddress;
@@ -69,6 +74,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
                         @Override
                         public void initChannel(SocketChannel channel) throws Exception {
                             channel.pipeline()
+                                    .addLast(new LengthFieldBasedFrameDecoder(65536,0,4,0,0))
                                     .addLast(new RpcDecoder(RpcRequest.class))
                                     .addLast(new RpcEncoder(RpcResponse.class))
                                     .addLast(new RpcHandler(handlerMap));
@@ -93,5 +99,16 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
+    }
+
+    public static void submit(Runnable task){
+        if(threadPoolExecutor == null){
+            synchronized (RpcServer.class) {
+                if(threadPoolExecutor == null){
+                    threadPoolExecutor = new ThreadPoolExecutor(16, 16, 600L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
+                }
+            }
+        }
+        threadPoolExecutor.submit(task);
     }
 }

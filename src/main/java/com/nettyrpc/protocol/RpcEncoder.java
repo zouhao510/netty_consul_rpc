@@ -1,4 +1,4 @@
-package com.nettyrpc.common;
+package com.nettyrpc.protocol;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -22,6 +22,7 @@ public class RpcEncoder extends MessageToByteEncoder {
     public void encode(ChannelHandlerContext ctx, Object in, ByteBuf out) throws Exception {
         if (genericClass.isInstance(in)) {
             byte[] data = SerializationUtil.serialize(in);
+            //byte[] data = JsonUtil.serialize(in); // Not use this, have some bugs
             out.writeInt(data.length);
             out.writeBytes(data);
         }

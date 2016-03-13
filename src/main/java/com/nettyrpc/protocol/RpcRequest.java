@@ -1,4 +1,4 @@
-package com.nettyrpc.common;
+package com.nettyrpc.protocol;
 
 /**
  * 封装 RPC 请求

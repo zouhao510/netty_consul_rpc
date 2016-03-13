@@ -1,7 +1,7 @@
 package com.nettyrpc.client;
 
-import com.nettyrpc.common.RpcRequest;
-import com.nettyrpc.common.RpcResponse;
+import com.nettyrpc.protocol.RpcRequest;
+import com.nettyrpc.protocol.RpcResponse;
 import com.nettyrpc.registry.ServiceDiscovery;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -45,18 +45,22 @@ public class RpcProxy {
                         if (serviceDiscovery != null) {
                             serverAddress = serviceDiscovery.discover();
                         }
+                        if(serverAddress != null){
+                            String[] array = serverAddress.split(":");
+                            String host = array[0];
+                            int port = Integer.parseInt(array[1]);
 
-                        String[] array = serverAddress.split(":");
-                        String host = array[0];
-                        int port = Integer.parseInt(array[1]);
+                            RpcClient client = new RpcClient(host, port);
+                            RpcResponse response = client.send(request);
 
-                        RpcClient client = new RpcClient(host, port);
-                        RpcResponse response = client.send(request);
-
-                        if (response.isError()) {
-                            throw response.getError();
-                        } else {
-                            return response.getResult();
+                            if (response.isError()) {
+                                throw new RuntimeException("Response error.",new Throwable(response.getError()));
+                            } else {
+                                return response.getResult();
+                            }
+                        }
+                        else{
+                            throw new RuntimeException("No server address found!");
                         }
                     }
                 }

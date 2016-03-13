@@ -1,4 +1,4 @@
-package com.nettyrpc.common;
+package com.nettyrpc.protocol;
 
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;

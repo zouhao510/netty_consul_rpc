@@ -1,7 +1,8 @@
 package com.nettyrpc.server;
 
-import com.nettyrpc.common.RpcRequest;
-import com.nettyrpc.common.RpcResponse;
+import com.nettyrpc.protocol.RpcRequest;
+import com.nettyrpc.protocol.RpcResponse;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 /**
  * RPC 处理器（用于处理 RPC 请求）
  *
- * @author huangyong
+ * @author huangyong, luxiaoxun
  * @since 1.0.0
  */
 public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
@@ -28,16 +29,28 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
     }
 
     @Override
-    public void channelRead0(final ChannelHandlerContext ctx, RpcRequest request) throws Exception {
-        RpcResponse response = new RpcResponse();
-        response.setRequestId(request.getRequestId());
-        try {
-            Object result = handle(request);
-            response.setResult(result);
-        } catch (Throwable t) {
-            response.setError(t);
-        }
-        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+    public void channelRead0(final ChannelHandlerContext ctx,final RpcRequest request) throws Exception {
+        RpcServer.submit(new Runnable() {
+            @Override
+            public void run() {
+                LOGGER.debug("Receive request " + request.getRequestId());
+                RpcResponse response = new RpcResponse();
+                response.setRequestId(request.getRequestId());
+                try {
+                    Object result = handle(request);
+                    response.setResult(result);
+                } catch (Throwable t) {
+                    response.setError(t.toString());
+                    LOGGER.error("RPC Server handle request error",t);
+                }
+                ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE).addListener(new ChannelFutureListener() {
+                    @Override
+                    public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                        LOGGER.debug("Send response for request " + request.getRequestId());
+                    }
+                });
+            }
+        });
     }
 
     private Object handle(RpcRequest request) throws Throwable {
