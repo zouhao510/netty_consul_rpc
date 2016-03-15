@@ -1,6 +1,6 @@
 package com.nettyrpc.test.app;
 
-import com.nettyrpc.client.RpcProxy;
+import com.nettyrpc.client.RpcClient;
 import com.nettyrpc.test.client.HelloPersonService;
 import com.nettyrpc.test.client.HelloService;
 import com.nettyrpc.test.client.Person;
@@ -22,18 +22,18 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class HelloServiceTest {
 
     @Autowired
-    private RpcProxy rpcProxy;
+    private RpcClient rpcClient;
 
     @Test
     public void helloTest1() {
-        HelloService helloService = rpcProxy.create(HelloService.class);
+        HelloService helloService = rpcClient.create(HelloService.class);
         String result = helloService.hello("World");
         Assert.assertEquals("Hello! World", result);
     }
 
     @Test
     public void helloTest2() {
-        HelloService helloService = rpcProxy.create(HelloService.class);
+        HelloService helloService = rpcClient.create(HelloService.class);
         Person person = new Person("Yong", "Huang");
         String result = helloService.hello(person);
         Assert.assertEquals("Hello! Yong Huang", result);
@@ -41,7 +41,7 @@ public class HelloServiceTest {
 
     @Test
     public void helloPersonTest(){
-        HelloPersonService helloPersonService = rpcProxy.create(HelloPersonService.class);
+        HelloPersonService helloPersonService = rpcClient.create(HelloPersonService.class);
         int num = 5;
         List<Person>  persons = helloPersonService.GetTestPerson("xiaoming",num);
         List<Person> expectedPersons = new ArrayList<>();

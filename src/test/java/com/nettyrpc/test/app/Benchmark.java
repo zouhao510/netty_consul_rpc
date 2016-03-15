@@ -1,10 +1,8 @@
 package com.nettyrpc.test.app;
 
-import com.nettyrpc.client.RpcProxy;
+import com.nettyrpc.client.RpcClient;
 import com.nettyrpc.registry.ServiceDiscovery;
 import com.nettyrpc.test.client.HelloService;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by luxiaoxun on 2016-03-11.
@@ -14,7 +12,7 @@ public class Benchmark {
     public static void main(String[] args) throws InterruptedException {
 
         ServiceDiscovery serviceDiscovery = new ServiceDiscovery("127.0.0.1:2181");
-        final RpcProxy rpcProxy = new RpcProxy(serviceDiscovery);
+        final RpcClient rpcClient = new RpcClient(serviceDiscovery);
 
         int threadNum = 10;
         final int requestNum = 100;
@@ -26,9 +24,8 @@ public class Benchmark {
             threads[i] = new Thread(new Runnable(){
                 @Override
                 public void run() {
-                    long start = System.currentTimeMillis();
                     for (int i = 0; i < requestNum; i++) {
-                        final HelloService syncClient = rpcProxy.create(HelloService.class);
+                        final HelloService syncClient = rpcClient.create(HelloService.class);
                         String result = syncClient.hello(Integer.toString(i));
                         if (!result.equals("Hello! " + i))
                             System.out.print("error = " + result);
@@ -43,6 +40,5 @@ public class Benchmark {
         long timeCost = (System.currentTimeMillis() - startTime);
         String msg = String.format("sync call total-time-cost:%sms, req/s=%s",timeCost,((double)(requestNum * threadNum)) / timeCost * 1000);
         System.out.println(msg);
-
     }
 }
