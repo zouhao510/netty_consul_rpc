@@ -6,11 +6,14 @@ An RPC framework based on Netty, ZooKeeper and Spring
 2) RPC Client will wait until it gets response.
 #### How to use
 1. Define an interface:
-    	public interface HelloService { 
+
+		public interface HelloService { 
 			String hello(String name); 
 			String hello(Person person);
 		}
+
 2. Implement the interface with annotation @RpcService:
+
 		@RpcService(HelloService.class)
 		public class HelloServiceImpl implements HelloService {
 			@Override
@@ -23,9 +26,13 @@ An RPC framework based on Netty, ZooKeeper and Spring
 				return "Hello! " + person.getFirstName() + " " + person.getLastName();
 			}
 		}
-3. Run the server with zookeeper
+
+3. Run the server with zookeeper:
+
 		RpcBootstrap
+
 4. Run the client:
+ 
 		ServiceDiscovery serviceDiscovery = new ServiceDiscovery("127.0.0.1:2181");
 		final RpcClient rpcClient = new RpcClient(serviceDiscovery);
 		HelloService helloService = rpcClient.create(HelloService.class);
