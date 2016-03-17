@@ -38,7 +38,9 @@ public class Benchmark {
             threads[i].join();
         }
         long timeCost = (System.currentTimeMillis() - startTime);
-        String msg = String.format("sync call total-time-cost:%sms, req/s=%s",timeCost,((double)(requestNum * threadNum)) / timeCost * 1000);
+        String msg = String.format("Sync call total-time-cost:%sms, req/s=%s",timeCost,((double)(requestNum * threadNum)) / timeCost * 1000);
         System.out.println(msg);
+
+        rpcClient.stop();
     }
 }

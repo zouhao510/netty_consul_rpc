@@ -43,7 +43,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
                     response.setError(t.toString());
                     LOGGER.error("RPC Server handle request error",t);
                 }
-                ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE).addListener(new ChannelFutureListener() {
+                ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(ChannelFuture channelFuture) throws Exception {
                         LOGGER.debug("Send response for request " + request.getRequestId());
@@ -62,10 +62,21 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
         Class<?>[] parameterTypes = request.getParameterTypes();
         Object[] parameters = request.getParameters();
 
+        LOGGER.debug(serviceClass.getName());
+        LOGGER.debug(methodName);
+        for (int i = 0; i < parameterTypes.length; ++i) {
+            LOGGER.debug(parameterTypes[i].getName());
+        }
+        for (int i = 0; i < parameters.length; ++i) {
+            LOGGER.debug(parameters[i].toString());
+        }
+
+        // JDK reflect
         /*Method method = serviceClass.getMethod(methodName, parameterTypes);
         method.setAccessible(true);
         return method.invoke(serviceBean, parameters);*/
 
+        // Cglib reflect
         FastClass serviceFastClass = FastClass.create(serviceClass);
         FastMethod serviceFastMethod = serviceFastClass.getMethod(methodName, parameterTypes);
         return serviceFastMethod.invoke(serviceBean, parameters);

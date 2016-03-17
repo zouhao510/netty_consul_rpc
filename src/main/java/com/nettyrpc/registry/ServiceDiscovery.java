@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
+
+import com.nettyrpc.client.ConnectManage;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -27,12 +29,13 @@ public class ServiceDiscovery {
     private volatile List<String> dataList = new ArrayList<>();
 
     private String registryAddress;
+    private ZooKeeper zookeeper;
 
     public ServiceDiscovery(String registryAddress) {
         this.registryAddress = registryAddress;
-        ZooKeeper zk = connectServer();
-        if (zk != null) {
-            watchNode(zk);
+        zookeeper = connectServer();
+        if (zookeeper != null) {
+            watchNode(zookeeper);
         }
     }
 
@@ -86,8 +89,25 @@ public class ServiceDiscovery {
             }
             LOGGER.debug("node data: {}", dataList);
             this.dataList = dataList;
+
+            LOGGER.debug("Service discovery triggered updating connected server node.");
+            UpdateConnectedServer();
         } catch (KeeperException | InterruptedException e) {
             LOGGER.error("", e);
+        }
+    }
+
+    private void UpdateConnectedServer(){
+        ConnectManage.getInstance().updateConnectedServer(this.dataList);
+    }
+
+    public void stop(){
+        if(zookeeper!=null){
+            try {
+                zookeeper.close();
+            } catch (InterruptedException e) {
+                LOGGER.error("", e);
+            }
         }
     }
 }

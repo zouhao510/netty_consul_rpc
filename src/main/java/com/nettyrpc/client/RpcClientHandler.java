@@ -1,51 +1,57 @@
 package com.nettyrpc.client;
 
-import com.nettyrpc.protocol.RpcDecoder;
-import com.nettyrpc.protocol.RpcEncoder;
 import com.nettyrpc.protocol.RpcRequest;
 import com.nettyrpc.protocol.RpcResponse;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CountDownLatch;
+import java.net.SocketAddress;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * RPC 客户端（用于发送 RPC 请求）
- *
- * @author huangyong
- * @author luxiaoxun
- * @since 1.0.0
+ * Created by luxiaoxun on 2016-03-14.
  */
 public class RpcClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcClientHandler.class);
 
-    private String host;
-    private int port;
+    private ConcurrentHashMap<String, RPCFuture> pendingRPC = new ConcurrentHashMap<>();
 
-    private RpcResponse response;
-    private CountDownLatch countWait = new CountDownLatch(1);
+    private volatile Channel channel;
+    private SocketAddress remotePeer;
 
-    public RpcClientHandler(String host, int port) {
-        this.host = host;
-        this.port = port;
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public SocketAddress getRemotePeer() {
+        return remotePeer;
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+        this.remotePeer = this.channel.remoteAddress();
+    }
+
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        super.channelRegistered(ctx);
+        this.channel = ctx.channel();
     }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, RpcResponse response) throws Exception {
-        this.response = response;
-        countWait.countDown();
+        String requestId = response.getRequestId();
+        RPCFuture rpcFuture = pendingRPC.get(requestId);
+        if (rpcFuture != null) {
+            pendingRPC.remove(requestId);
+            rpcFuture.done(response);
+        }
     }
 
     @Override
@@ -54,37 +60,15 @@ public class RpcClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
         ctx.close();
     }
 
-    public RpcResponse send(RpcRequest request) throws Exception {
-        EventLoopGroup group = new NioEventLoopGroup();
-        try {
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(group).channel(NioSocketChannel.class)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        public void initChannel(SocketChannel channel) throws Exception {
-                            channel.pipeline()
-                                    .addLast(new RpcEncoder(RpcRequest.class))
-                                    .addLast(new LengthFieldBasedFrameDecoder(65536,0,4,0,0))
-                                    .addLast(new RpcDecoder(RpcResponse.class))
-                                    .addLast(RpcClientHandler.this);
-                        }
-                    })
-                    .option(ChannelOption.SO_KEEPALIVE, true)
-                    .option(ChannelOption.SO_REUSEADDR,true);
+    public void close() {
+        channel.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
+    }
 
-            ChannelFuture future = bootstrap.connect(host, port).sync();
-            future.channel().writeAndFlush(request).sync();
+    public RPCFuture sendRequest(RpcRequest request) {
+        RPCFuture rpcFuture = new RPCFuture(request);
+        pendingRPC.put(request.getRequestId(), rpcFuture);
+        channel.writeAndFlush(request);
 
-            LOGGER.debug("Waiting for response for request " + request.getRequestId());
-            countWait.await();
-            LOGGER.debug("Receive response for request "+request.getRequestId());
-
-            if (response != null) {
-                future.channel().closeFuture().sync();
-            }
-            return response;
-        } finally {
-            group.shutdownGracefully();
-        }
+        return rpcFuture;
     }
 }
