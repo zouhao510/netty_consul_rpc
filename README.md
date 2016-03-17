@@ -1,9 +1,13 @@
 # NettyRpc
 An RPC framework based on Netty, ZooKeeper and Spring  
 中文详情：[Chinese Details](http://www.cnblogs.com/luxiaoxun/p/5272384.html)
-### NettyRpc-1.0
-1) RPC Client send request with short connection by netty.  
-2) RPC Client will wait until it gets response.
+### Features:
+* Simple code and framework
+* Non-blocking asynchronous call and Synchronous call support
+* Long lived persistent connection
+* High availability, load balance and failover
+* Service Discovery support by ZooKeeper
+
 #### How to use
 1. Define an interface:
 
@@ -35,5 +39,10 @@ An RPC framework based on Netty, ZooKeeper and Spring
  
 		ServiceDiscovery serviceDiscovery = new ServiceDiscovery("127.0.0.1:2181");
 		final RpcClient rpcClient = new RpcClient(serviceDiscovery);
+		// Sync call
 		HelloService helloService = rpcClient.create(HelloService.class);
 		String result = helloService.hello("World");
+		// Async call
+		IAsyncObjectProxy client = rpcClient.createAsync(HelloService.class);
+		RPCFuture helloFuture = client.call("hello", "World");
+   		String result = (String) helloFuture.get(3000, TimeUnit.MILLISECONDS);
