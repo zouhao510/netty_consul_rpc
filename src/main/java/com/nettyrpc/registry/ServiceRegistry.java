@@ -16,7 +16,8 @@ import sun.rmi.runtime.Log;
 /**
  * 服务注册
  *
- * @author huangyong, luxiaoxun
+ * @author huangyong
+ * @author luxiaoxun
  * @since 1.0.0
  */
 public class ServiceRegistry {

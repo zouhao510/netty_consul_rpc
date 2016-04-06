@@ -15,7 +15,7 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created by jsc on 2016-03-15.
+ * Created by luxiaoxun on 2016-03-15.
  */
 public class RPCFuture implements Future<Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RPCFuture.class);
