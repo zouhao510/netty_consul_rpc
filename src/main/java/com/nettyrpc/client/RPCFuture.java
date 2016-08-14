@@ -15,6 +15,7 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * RPCFuture for async RPC call
  * Created by luxiaoxun on 2016-03-15.
  */
 public class RPCFuture implements Future<Object> {

@@ -1,10 +1,9 @@
 package com.nettyrpc.registry;
 
 /**
- * 常量
+ * ZooKeeper constant
  *
  * @author huangyong
- * @since 1.0.0
  */
 public interface Constant {
 

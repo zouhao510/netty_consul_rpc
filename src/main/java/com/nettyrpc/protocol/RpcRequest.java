@@ -1,10 +1,8 @@
 package com.nettyrpc.protocol;
 
 /**
- * 封装 RPC 请求
- *
+ * RPC Request
  * @author huangyong
- * @since 1.0.0
  */
 public class RpcRequest {
 

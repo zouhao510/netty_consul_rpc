@@ -5,10 +5,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 /**
- * RPC 编码器
- *
+ * RPC Encoder
  * @author huangyong
- * @since 1.0.0
  */
 public class RpcEncoder extends MessageToByteEncoder {
 

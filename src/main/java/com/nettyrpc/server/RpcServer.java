@@ -27,10 +27,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * RPC 服务器（用于发布 RPC 服务）
- *
+ * RPC Server
  * @author huangyong,luxiaoxun
- * @since 1.0.0
  */
 public class RpcServer implements ApplicationContextAware, InitializingBean {
 

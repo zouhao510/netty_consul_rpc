@@ -1,10 +1,8 @@
 package com.nettyrpc.protocol;
 
 /**
- * 封装 RPC 响应
- *
+ * RPC Response
  * @author huangyong
- * @since 1.0.0
  */
 public class RpcResponse {
 

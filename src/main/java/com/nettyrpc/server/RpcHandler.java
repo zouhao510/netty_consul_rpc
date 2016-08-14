@@ -13,10 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * RPC 处理器（用于处理 RPC 请求）
- *
+ * RPC Handler（RPC request processor）
  * @author luxiaoxun
- * @since 1.0.0
  */
 public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
 

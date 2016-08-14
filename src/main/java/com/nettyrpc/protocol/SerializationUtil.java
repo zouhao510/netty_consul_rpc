@@ -10,10 +10,8 @@ import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 
 /**
- * 序列化工具类（基于 Protostuff 实现）
- *
+ * Serialization Util（Based on Protostuff）
  * @author huangyong
- * @since 1.0.0
  */
 public class SerializationUtil {
 

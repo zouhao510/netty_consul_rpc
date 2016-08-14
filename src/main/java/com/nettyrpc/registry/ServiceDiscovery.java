@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author huangyong
  * @author luxiaoxun
- * @since 1.0.0
  */
 public class ServiceDiscovery {
 

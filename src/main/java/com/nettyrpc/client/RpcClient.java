@@ -10,8 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * RPC 客户端（用于创建 RPC 服务代理）
- *
+ * RPC Client（Create RPC proxy）
  * @author luxiaoxun
  */
 public class RpcClient {
