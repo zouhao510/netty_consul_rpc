@@ -31,11 +31,13 @@ An RPC framework based on Netty, ZooKeeper and Spring
 			}
 		}
 
-3. Run the server with zookeeper:
+3. Run zookeeper
+
+4. Start server:
 
 		RpcBootstrap
 
-4. Run the client:
+5. Use the client:
  
 		ServiceDiscovery serviceDiscovery = new ServiceDiscovery("127.0.0.1:2181");
 		final RpcClient rpcClient = new RpcClient(serviceDiscovery);
