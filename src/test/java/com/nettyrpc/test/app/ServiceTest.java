@@ -3,7 +3,7 @@ package com.nettyrpc.test.app;
 import com.nettyrpc.client.RPCFuture;
 import com.nettyrpc.client.RpcClient;
 import com.nettyrpc.client.proxy.IAsyncObjectProxy;
-import com.nettyrpc.test.client.HelloPersonService;
+import com.nettyrpc.test.client.PersonService;
 import com.nettyrpc.test.client.HelloService;
 import com.nettyrpc.test.client.Person;
 import org.junit.After;
@@ -23,7 +23,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:client-spring.xml")
-public class HelloServiceTest {
+public class ServiceTest {
 
     @Autowired
     private RpcClient rpcClient;
@@ -44,17 +44,17 @@ public class HelloServiceTest {
     }
 
     @Test
-    public void helloPersonTest(){
-        HelloPersonService helloPersonService = rpcClient.create(HelloPersonService.class);
+    public void helloPersonTest() {
+        PersonService personService = rpcClient.create(PersonService.class);
         int num = 5;
-        List<Person>  persons = helloPersonService.GetTestPerson("xiaoming",num);
+        List<Person> persons = personService.GetTestPerson("xiaoming", num);
         List<Person> expectedPersons = new ArrayList<>();
         for (int i = 0; i < num; i++) {
             expectedPersons.add(new Person(Integer.toString(i), "xiaoming"));
         }
         assertThat(persons, equalTo(expectedPersons));
 
-        for (int i = 0; i<persons.size(); ++i){
+        for (int i = 0; i < persons.size(); ++i) {
             System.out.println(persons.get(i));
         }
     }
@@ -76,7 +76,7 @@ public class HelloServiceTest {
 
     @Test
     public void helloPersonFutureTest1() throws ExecutionException, InterruptedException {
-        IAsyncObjectProxy helloPersonService = rpcClient.createAsync(HelloPersonService.class);
+        IAsyncObjectProxy helloPersonService = rpcClient.createAsync(PersonService.class);
         int num = 5;
         RPCFuture result = helloPersonService.call("GetTestPerson", "xiaoming", num);
         List<Person> persons = (List<Person>) result.get();
@@ -92,8 +92,8 @@ public class HelloServiceTest {
     }
 
     @After
-    public void setTear(){
-        if(rpcClient != null) {
+    public void setTear() {
+        if (rpcClient != null) {
             rpcClient.stop();
         }
     }

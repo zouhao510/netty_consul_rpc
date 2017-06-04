@@ -5,7 +5,7 @@ import com.nettyrpc.client.RPCFuture;
 import com.nettyrpc.client.RpcClient;
 import com.nettyrpc.client.proxy.IAsyncObjectProxy;
 import com.nettyrpc.registry.ServiceDiscovery;
-import com.nettyrpc.test.client.HelloPersonService;
+import com.nettyrpc.test.client.PersonService;
 import com.nettyrpc.test.client.Person;
 
 import java.util.List;
@@ -14,14 +14,14 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by luxiaoxun on 2016/3/17.
  */
-public class HelloPersonCallbackTest {
+public class PersonCallbackTest {
     public static void main(String[] args) {
         ServiceDiscovery serviceDiscovery = new ServiceDiscovery("127.0.0.1:2181");
         final RpcClient rpcClient = new RpcClient(serviceDiscovery);
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         try {
-            IAsyncObjectProxy client = rpcClient.createAsync(HelloPersonService.class);
+            IAsyncObjectProxy client = rpcClient.createAsync(PersonService.class);
             int num = 5;
             RPCFuture helloPersonFuture = client.call("GetTestPerson", "xiaoming", num);
             helloPersonFuture.addCallback(new AsyncRPCCallback() {
