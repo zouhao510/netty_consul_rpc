@@ -5,7 +5,6 @@ package com.nettyrpc.protocol;
  * @author huangyong
  */
 public class RpcResponse {
-
     private String requestId;
     private String error;
     private Object result;

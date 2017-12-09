@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ServiceDiscovery {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceDiscovery.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServiceDiscovery.class);
 
     private CountDownLatch latch = new CountDownLatch(1);
 
@@ -45,10 +45,10 @@ public class ServiceDiscovery {
         if (size > 0) {
             if (size == 1) {
                 data = dataList.get(0);
-                LOGGER.debug("using only data: {}", data);
+                logger.debug("using only data: {}", data);
             } else {
                 data = dataList.get(ThreadLocalRandom.current().nextInt(size));
-                LOGGER.debug("using random data: {}", data);
+                logger.debug("using random data: {}", data);
             }
         }
         return data;
@@ -67,7 +67,7 @@ public class ServiceDiscovery {
             });
             latch.await();
         } catch (IOException | InterruptedException e) {
-            LOGGER.error("", e);
+            logger.error("", e);
         }
         return zk;
     }
@@ -87,13 +87,13 @@ public class ServiceDiscovery {
                 byte[] bytes = zk.getData(Constant.ZK_REGISTRY_PATH + "/" + node, false, null);
                 dataList.add(new String(bytes));
             }
-            LOGGER.debug("node data: {}", dataList);
+            logger.debug("node data: {}", dataList);
             this.dataList = dataList;
 
-            LOGGER.debug("Service discovery triggered updating connected server node.");
+            logger.debug("Service discovery triggered updating connected server node.");
             UpdateConnectedServer();
         } catch (KeeperException | InterruptedException e) {
-            LOGGER.error("", e);
+            logger.error("", e);
         }
     }
 
@@ -106,7 +106,7 @@ public class ServiceDiscovery {
             try {
                 zookeeper.close();
             } catch (InterruptedException e) {
-                LOGGER.error("", e);
+                logger.error("", e);
             }
         }
     }

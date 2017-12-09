@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RpcHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(RpcHandler.class);
 
     private final Map<String, Object> handlerMap;
 
@@ -31,7 +31,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
         RpcServer.submit(new Runnable() {
             @Override
             public void run() {
-                LOGGER.debug("Receive request " + request.getRequestId());
+                logger.debug("Receive request " + request.getRequestId());
                 RpcResponse response = new RpcResponse();
                 response.setRequestId(request.getRequestId());
                 try {
@@ -39,12 +39,12 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
                     response.setResult(result);
                 } catch (Throwable t) {
                     response.setError(t.toString());
-                    LOGGER.error("RPC Server handle request error",t);
+                    logger.error("RPC Server handle request error",t);
                 }
                 ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                        LOGGER.debug("Send response for request " + request.getRequestId());
+                        logger.debug("Send response for request " + request.getRequestId());
                     }
                 });
             }
@@ -60,13 +60,13 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
         Class<?>[] parameterTypes = request.getParameterTypes();
         Object[] parameters = request.getParameters();
 
-        LOGGER.debug(serviceClass.getName());
-        LOGGER.debug(methodName);
+        logger.debug(serviceClass.getName());
+        logger.debug(methodName);
         for (int i = 0; i < parameterTypes.length; ++i) {
-            LOGGER.debug(parameterTypes[i].getName());
+            logger.debug(parameterTypes[i].getName());
         }
         for (int i = 0; i < parameters.length; ++i) {
-            LOGGER.debug(parameters[i].toString());
+            logger.debug(parameters[i].toString());
         }
 
         // JDK reflect
@@ -82,7 +82,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        LOGGER.error("server caught exception", cause);
+        logger.error("server caught exception", cause);
         ctx.close();
     }
 }

@@ -15,7 +15,7 @@ import java.util.concurrent.CountDownLatch;
  * Created by luxiaoxun on 2016-03-14.
  */
 public class RpcClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RpcClientHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(RpcClientHandler.class);
 
     private ConcurrentHashMap<String, RPCFuture> pendingRPC = new ConcurrentHashMap<>();
 
@@ -54,7 +54,7 @@ public class RpcClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOGGER.error("client caught exception", cause);
+        logger.error("client caught exception", cause);
         ctx.close();
     }
 
@@ -75,7 +75,7 @@ public class RpcClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage());
+            logger.error(e.getMessage());
         }
 
         return rpcFuture;

@@ -11,7 +11,6 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.rmi.runtime.Log;
 
 /**
  * 服务注册
@@ -21,7 +20,7 @@ import sun.rmi.runtime.Log;
  */
 public class ServiceRegistry {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServiceRegistry.class);
 
     private CountDownLatch latch = new CountDownLatch(1);
 
@@ -54,10 +53,10 @@ public class ServiceRegistry {
             });
             latch.await();
         } catch (IOException e) {
-            LOGGER.error("", e);
+            logger.error("", e);
         }
         catch (InterruptedException ex){
-            LOGGER.error("", ex);
+            logger.error("", ex);
         }
         return zk;
     }
@@ -69,9 +68,9 @@ public class ServiceRegistry {
                 zk.create(Constant.ZK_REGISTRY_PATH, new byte[0], ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             }
         } catch (KeeperException e) {
-            LOGGER.error(e.toString());
+            logger.error(e.toString());
         } catch (InterruptedException e) {
-            LOGGER.error(e.toString());
+            logger.error(e.toString());
         }
     }
 
@@ -79,12 +78,12 @@ public class ServiceRegistry {
         try {
             byte[] bytes = data.getBytes();
             String path = zk.create(Constant.ZK_DATA_PATH, bytes, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
-            LOGGER.debug("create zookeeper node ({} => {})", path, data);
+            logger.debug("create zookeeper node ({} => {})", path, data);
         } catch (KeeperException e) {
-            LOGGER.error("", e);
+            logger.error("", e);
         }
         catch (InterruptedException ex){
-            LOGGER.error("", ex);
+            logger.error("", ex);
         }
     }
 }

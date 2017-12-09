@@ -24,11 +24,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by luxiaoxun on 2016-03-16.
  */
 public class ConnectManage {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectManage.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConnectManage.class);
     private volatile static ConnectManage connectManage;
 
-    EventLoopGroup eventLoopGroup = new NioEventLoopGroup(4);
+    private EventLoopGroup eventLoopGroup = new NioEventLoopGroup(4);
     private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16, 600L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
 
     private CopyOnWriteArrayList<RpcClientHandler> connectedHandlers = new CopyOnWriteArrayList<>();
@@ -37,7 +36,7 @@ public class ConnectManage {
 
     private ReentrantLock lock = new ReentrantLock();
     private Condition connected = lock.newCondition();
-    protected long connectTimeoutMillis = 6000;
+    private long connectTimeoutMillis = 6000;
     private AtomicInteger roundRobin = new AtomicInteger(0);
     private volatile boolean isRuning = true;
 
@@ -82,16 +81,18 @@ public class ConnectManage {
                     RpcClientHandler connectedServerHandler = connectedHandlers.get(i);
                     SocketAddress remotePeer = connectedServerHandler.getRemotePeer();
                     if (!newAllServerNodeSet.contains(remotePeer)) {
-                        LOGGER.info("Remove invalid server node " + remotePeer);
+                        logger.info("Remove invalid server node " + remotePeer);
                         RpcClientHandler handler = connectedServerNodes.get(remotePeer);
-                        handler.close();
+                        if (handler != null) {
+                            handler.close();
+                        }
                         connectedServerNodes.remove(remotePeer);
                         connectedHandlers.remove(connectedServerHandler);
                     }
                 }
 
             } else { // No available server node ( All server nodes are down )
-                LOGGER.error("No available server node. All server nodes are down !!!");
+                logger.error("No available server node. All server nodes are down !!!");
                 for (final RpcClientHandler connectedServerHandler : connectedHandlers) {
                     SocketAddress remotePeer = connectedServerHandler.getRemotePeer();
                     RpcClientHandler handler = connectedServerNodes.get(remotePeer);
@@ -103,12 +104,12 @@ public class ConnectManage {
         }
     }
 
-    public void  reconnect(final RpcClientHandler handler, final SocketAddress remotePeer){
-        if(handler!=null){
+    public void reconnect(final RpcClientHandler handler, final SocketAddress remotePeer) {
+        if (handler != null) {
             connectedHandlers.remove(handler);
             connectedServerNodes.remove(handler.getRemotePeer());
         }
-        connectServerNode((InetSocketAddress)remotePeer);
+        connectServerNode((InetSocketAddress) remotePeer);
     }
 
     private void connectServerNode(final InetSocketAddress remotePeer) {
@@ -125,7 +126,7 @@ public class ConnectManage {
                     @Override
                     public void operationComplete(final ChannelFuture channelFuture) throws Exception {
                         if (channelFuture.isSuccess()) {
-                            LOGGER.debug("Successfully connect to remote server. remote peer = " + remotePeer);
+                            logger.debug("Successfully connect to remote server. remote peer = " + remotePeer);
                             RpcClientHandler handler = channelFuture.channel().pipeline().get(RpcClientHandler.class);
                             addHandler(handler);
                         }
@@ -171,7 +172,7 @@ public class ConnectManage {
                     size = handlers.size();
                 }
             } catch (InterruptedException e) {
-                LOGGER.error("Waiting for available node is interrupted! ", e);
+                logger.error("Waiting for available node is interrupted! ", e);
                 throw new RuntimeException("Can't connect any servers!", e);
             }
         }
@@ -179,7 +180,7 @@ public class ConnectManage {
         return handlers.get(index);
     }
 
-    public void stop(){
+    public void stop() {
         isRuning = false;
         for (int i = 0; i < connectedHandlers.size(); ++i) {
             RpcClientHandler connectedServerHandler = connectedHandlers.get(i);

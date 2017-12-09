@@ -5,7 +5,6 @@ package com.nettyrpc.protocol;
  * @author huangyong
  */
 public class RpcRequest {
-
     private String requestId;
     private String className;
     private String methodName;

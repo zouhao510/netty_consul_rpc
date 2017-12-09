@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by luxiaoxun on 2016-03-15.
  */
 public class RPCFuture implements Future<Object> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RPCFuture.class);
+    private static final Logger logger = LoggerFactory.getLogger(RPCFuture.class);
 
     private Sync sync;
     private RpcRequest request;
@@ -85,7 +85,7 @@ public class RPCFuture implements Future<Object> {
         // Threshold
         long responseTime = System.currentTimeMillis() - startTime;
         if (responseTime > this.responseTimeThreshold) {
-            LOGGER.warn("Service response time is too slow. Request id = " + reponse.getRequestId() + ". Response Time = " + responseTime + "ms");
+            logger.warn("Service response time is too slow. Request id = " + reponse.getRequestId() + ". Response Time = " + responseTime + "ms");
         }
     }
 
