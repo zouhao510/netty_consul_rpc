@@ -7,6 +7,10 @@ import com.nettyrpc.server.RpcService;
 @RpcService(HelloService.class)
 public class HelloServiceImpl implements HelloService {
 
+    public HelloServiceImpl(){
+
+    }
+
     @Override
     public String hello(String name) {
         return "Hello! " + name;
