@@ -41,7 +41,7 @@ An RPC framework based on Netty, ZooKeeper and Spring
 
    Start server with spring: RpcBootstrap
 
-   Start srever without spring: RpcBootstrapWithoutSpring
+   Start server without spring: RpcBootstrapWithoutSpring
 
 5. Use the client:
  
