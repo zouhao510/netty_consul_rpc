@@ -20,6 +20,8 @@ An RPC framework based on Netty, ZooKeeper and Spring
 
 		@RpcService(HelloService.class)
 		public class HelloServiceImpl implements HelloService {
+			public HelloServiceImpl(){}
+			
 			@Override
 			public String hello(String name) {
 				return "Hello! " + name;
@@ -33,9 +35,13 @@ An RPC framework based on Netty, ZooKeeper and Spring
 
 3. Run zookeeper
 
+   For example: zookeeper is running on 127.0.0.1:2181
+
 4. Start server:
 
-		RpcBootstrap
+   Start server with spring: RpcBootstrap
+
+   Start srever without spring: RpcBootstrapWithoutSpring
 
 5. Use the client:
  
