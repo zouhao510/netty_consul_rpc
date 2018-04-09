@@ -35,7 +35,7 @@ public class JsonUtil {
         objMapper.configure(JsonParser.Feature.IGNORE_UNDEFINED, true);
     }
 
-    public static <T> byte[] serialize(T obj){
+    public static <T> byte[] serialize(T obj) {
         byte[] bytes = new byte[0];
         try {
             bytes = objMapper.writeValueAsBytes(obj);
@@ -48,13 +48,12 @@ public class JsonUtil {
     public static <T> T deserialize(byte[] data, Class<T> cls) {
         T obj = null;
         try {
-            obj = objMapper.readValue(data,cls);
+            obj = objMapper.readValue(data, cls);
         } catch (IOException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
         return obj;
     }
-
 
     public static <type> type jsonToObject(String json, Class<?> cls) {
         type obj = null;
@@ -83,7 +82,7 @@ public class JsonUtil {
     public static <type> type jsonToObjectHashMap(String json,
                                                   Class<?> keyClass, Class<?> valueClass) {
         type obj = null;
-        JavaType javaType = objMapper.getTypeFactory().constructParametricType(HashMap.class, keyClass,valueClass);
+        JavaType javaType = objMapper.getTypeFactory().constructParametricType(HashMap.class, keyClass, valueClass);
         try {
             obj = objMapper.readValue(json, javaType);
         } catch (IOException e) {

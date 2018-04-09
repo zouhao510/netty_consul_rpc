@@ -103,10 +103,10 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
         return request;
     }
 
-    private Class<?> getClassType(Object obj){
+    private Class<?> getClassType(Object obj) {
         Class<?> classType = obj.getClass();
         String typeName = classType.getName();
-        switch (typeName){
+        switch (typeName) {
             case "java.lang.Integer":
                 return Integer.TYPE;
             case "java.lang.Long":

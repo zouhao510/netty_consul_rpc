@@ -137,7 +137,7 @@ public class RPCFuture implements Future<Object> {
         private final int pending = 0;
 
         protected boolean tryAcquire(int acquires) {
-            return getState() == done ? true : false;
+            return getState() == done;
         }
 
         protected boolean tryRelease(int releases) {

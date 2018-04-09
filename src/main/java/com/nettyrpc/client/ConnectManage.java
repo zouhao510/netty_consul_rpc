@@ -28,11 +28,11 @@ public class ConnectManage {
     private volatile static ConnectManage connectManage;
 
     private EventLoopGroup eventLoopGroup = new NioEventLoopGroup(4);
-    private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16, 600L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
+    private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16,
+            600L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
 
     private CopyOnWriteArrayList<RpcClientHandler> connectedHandlers = new CopyOnWriteArrayList<>();
     private Map<InetSocketAddress, RpcClientHandler> connectedServerNodes = new ConcurrentHashMap<>();
-    //private Map<InetSocketAddress, Channel> connectedServerNodes = new ConcurrentHashMap<>();
 
     private ReentrantLock lock = new ReentrantLock();
     private Condition connected = lock.newCondition();
@@ -162,14 +162,12 @@ public class ConnectManage {
     }
 
     public RpcClientHandler chooseHandler() {
-        CopyOnWriteArrayList<RpcClientHandler> handlers = (CopyOnWriteArrayList<RpcClientHandler>) this.connectedHandlers.clone();
-        int size = handlers.size();
+        int size = connectedHandlers.size();
         while (isRuning && size <= 0) {
             try {
                 boolean available = waitingForHandler();
                 if (available) {
-                    handlers = (CopyOnWriteArrayList<RpcClientHandler>) this.connectedHandlers.clone();
-                    size = handlers.size();
+                    size = connectedHandlers.size();
                 }
             } catch (InterruptedException e) {
                 logger.error("Waiting for available node is interrupted! ", e);
@@ -177,7 +175,7 @@ public class ConnectManage {
             }
         }
         int index = (roundRobin.getAndAdd(1) + size) % size;
-        return handlers.get(index);
+        return connectedHandlers.get(index);
     }
 
     public void stop() {
