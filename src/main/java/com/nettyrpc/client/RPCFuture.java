@@ -25,7 +25,6 @@ public class RPCFuture implements Future<Object> {
     private RpcRequest request;
     private RpcResponse response;
     private long startTime;
-
     private long responseTimeThreshold = 5000;
 
     private List<AsyncRPCCallback> pendingCallbacks = new ArrayList<AsyncRPCCallback>();
@@ -136,17 +135,22 @@ public class RPCFuture implements Future<Object> {
         private final int done = 1;
         private final int pending = 0;
 
-        protected boolean tryAcquire(int acquires) {
+        @Override
+        protected boolean tryAcquire(int arg) {
             return getState() == done;
         }
 
-        protected boolean tryRelease(int releases) {
+        @Override
+        protected boolean tryRelease(int arg) {
             if (getState() == pending) {
                 if (compareAndSetState(pending, done)) {
                     return true;
+                } else {
+                    return false;
                 }
+            } else {
+                return true;
             }
-            return false;
         }
 
         public boolean isDone() {
