@@ -7,8 +7,9 @@ An RPC framework based on Netty, ZooKeeper and Spring
 * Long lived persistent connection
 * High availability, load balance and failover
 * Service Discovery support by ZooKeeper
-
-#### How to use
+### Design:
+![design](https://images2015.cnblogs.com/blog/434101/201603/434101-20160316102651631-1816064105.png)
+### How to use
 1. Define an interface:
 
 		public interface HelloService { 
