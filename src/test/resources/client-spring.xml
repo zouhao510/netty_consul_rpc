@@ -9,7 +9,7 @@
 
     <context:property-placeholder location="classpath:rpc.properties"/>
 
-    <bean id="serviceDiscovery" class="com.nettyrpc.registry.ServiceDiscovery">
+    <bean id="serviceDiscovery" class="com.nettyrpc.registry.ConsulServiceDiscovery">
         <constructor-arg name="registryAddress" value="${registry.address}"/>
     </bean>
 

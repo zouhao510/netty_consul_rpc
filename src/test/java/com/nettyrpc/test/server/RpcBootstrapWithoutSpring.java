@@ -1,5 +1,6 @@
 package com.nettyrpc.test.server;
 
+import com.nettyrpc.registry.ConsulServiceRegistry;
 import com.nettyrpc.registry.ServiceRegistry;
 import com.nettyrpc.server.RpcServer;
 import com.nettyrpc.test.client.HelloService;
@@ -11,7 +12,7 @@ public class RpcBootstrapWithoutSpring {
 
     public static void main(String[] args) {
         String serverAddress = "127.0.0.1:18866";
-        ServiceRegistry serviceRegistry = new ServiceRegistry("127.0.0.1:2181");
+        ConsulServiceRegistry serviceRegistry = new ConsulServiceRegistry("127.0.0.1:8500");
         RpcServer rpcServer = new RpcServer(serverAddress, serviceRegistry);
         HelloService helloService = new HelloServiceImpl();
         rpcServer.addService("com.nettyrpc.test.client.HelloService", helloService);

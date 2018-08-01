@@ -4,6 +4,7 @@ import com.nettyrpc.protocol.RpcDecoder;
 import com.nettyrpc.protocol.RpcEncoder;
 import com.nettyrpc.protocol.RpcRequest;
 import com.nettyrpc.protocol.RpcResponse;
+import com.nettyrpc.registry.ConsulServiceRegistry;
 import com.nettyrpc.registry.ServiceRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -37,7 +38,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
     private static final Logger logger = LoggerFactory.getLogger(RpcServer.class);
 
     private String serverAddress;
-    private ServiceRegistry serviceRegistry;
+    private ConsulServiceRegistry serviceRegistry;
 
     private Map<String, Object> handlerMap = new HashMap<>();
     private static ThreadPoolExecutor threadPoolExecutor;
@@ -49,7 +50,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
         this.serverAddress = serverAddress;
     }
 
-    public RpcServer(String serverAddress, ServiceRegistry serviceRegistry) {
+    public RpcServer(String serverAddress, ConsulServiceRegistry serviceRegistry) {
         this.serverAddress = serverAddress;
         this.serviceRegistry = serviceRegistry;
     }

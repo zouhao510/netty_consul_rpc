@@ -2,6 +2,7 @@ package com.nettyrpc.client;
 
 import com.nettyrpc.client.proxy.IAsyncObjectProxy;
 import com.nettyrpc.client.proxy.ObjectProxy;
+import com.nettyrpc.registry.ConsulServiceDiscovery;
 import com.nettyrpc.registry.ServiceDiscovery;
 
 import java.lang.reflect.Proxy;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class RpcClient {
 
     private String serverAddress;
-    private ServiceDiscovery serviceDiscovery;
+    private ConsulServiceDiscovery serviceDiscovery;
     private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16,
             600L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
 
@@ -25,7 +26,7 @@ public class RpcClient {
         this.serverAddress = serverAddress;
     }
 
-    public RpcClient(ServiceDiscovery serviceDiscovery) {
+    public RpcClient(ConsulServiceDiscovery serviceDiscovery) {
         this.serviceDiscovery = serviceDiscovery;
     }
 
@@ -48,7 +49,7 @@ public class RpcClient {
 
     public void stop() {
         threadPoolExecutor.shutdown();
-        serviceDiscovery.stop();
+        //serviceDiscovery.stop();
         ConnectManage.getInstance().stop();
     }
 }
